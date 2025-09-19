@@ -1,57 +1,69 @@
 #include "DataStructureA.h"
-#include <iostream>
 
-DataStructureA::DataStructureA():size(0),capacity(1),data(nullptr) {
+DataStructureA::DataStructureA() : size(0), capacity(1), data(nullptr)
+{
     data = AllocTraits::allocate(alloc, capacity);
 }
 
 void DataStructureA::insert(int id, int score)
 {
     int left = 0, right = size - 1;
-    size_t mid;
+    size_t mid = -1;
     bool found = false;
-    while(left <= right) {
+    while (left <= right)
+    {
         mid = (left + right) / 2;
         if (data[mid].id < id)
             left = mid + 1;
         else if (data[mid].id > id)
             right = mid - 1;
-        else {
+        else
+        {
             found = true;
             break;
         }
     }
-    if (found) {
+    if (found)
+    {
         data[mid].scores.push_back(score);
-    } else {
+    }
+    else
+    {
         size_t new_capacity = capacity;
         if (size == capacity)
             new_capacity = capacity * 10;
 
         bool inserted = false;
-        StudentProfile *new_data = AllocTraits::allocate(alloc, new_capacity);
-        for (StudentProfile *p = data, *q = new_data; p < data + size;)
+        StudentProfileA *new_data = AllocTraits::allocate(alloc, new_capacity);
+        for (StudentProfileA *p = data, *q = new_data; p < data + size; ++q)
         {
-            if (!inserted && id <= p->id) {
+            if (!inserted && id < p->id)
+            {
                 AllocTraits::construct(alloc, q, id);
                 q->scores.push_back(score);
                 inserted = true;
-                ++q;
-            } else {
+            }
+            else
+            {
                 AllocTraits::construct(alloc, q, std::move(*p));
                 ++p;
-                ++q;
             }
         }
-        if (!inserted) {
+        if (!inserted)
+        {
             AllocTraits::construct(alloc, new_data + size, id);
             (new_data + size)->scores.push_back(score);
+        }
+        for (size_t i = 0; i < size; ++i)
+        {
+            AllocTraits::destroy(alloc, data + i);
         }
         AllocTraits::deallocate(alloc, data, capacity);
         data = new_data;
         capacity = new_capacity;
+
+        ++size;
     }
-    ++size;
 }
 
 std::vector<int> DataStructureA::search(int id)
@@ -76,4 +88,14 @@ std::vector<int> DataStructureA::search(int id)
         return data[mid].scores;
     else
         return std::vector<int>{-1};
+}
+size_t DataStructureA::total()
+{
+    size_t result = 0;
+    for (size_t i = 0; i < size; ++i)
+    {
+        for (auto score : data[i].scores)
+            result += score;
+    }
+    return result;
 }

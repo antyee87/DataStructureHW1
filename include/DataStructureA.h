@@ -3,23 +3,26 @@
 #include <memory>
 #include <vector>
 
-class StudentProfile {
+class StudentProfileA
+{
 public:
-    StudentProfile(int id) : id(id){}
+    StudentProfileA(int id) : id(id) {}
     int id;
     std::vector<int> scores;
 };
 
-class DataStructureA : public HomeworkRequirement {
+class DataStructureA : public HomeworkRequirement
+{
 public:
-    using AllocTraits = std::allocator_traits<std::allocator<StudentProfile>>;
+    using AllocTraits = std::allocator_traits<std::allocator<StudentProfileA>>;
 
     DataStructureA();
     void insert(int id, int score) override;
     std::vector<int> search(int id) override;
+    size_t total() override;
     size_t size;
     size_t capacity;
-    StudentProfile *data;
+    StudentProfileA *data;
 
-    std::allocator<StudentProfile> alloc;
+    std::allocator<StudentProfileA> alloc;
 };
