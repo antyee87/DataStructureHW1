@@ -1,6 +1,7 @@
 #include <chrono>
-#include <fstream>
+#include <csignal>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <nlohmann/json.hpp>
@@ -11,10 +12,10 @@
 #define BLOCK_2
 
 using json = nlohmann::ordered_json;
-const std::string name_mapping[] = {"Data structure A", "Data structure B", "Data structure C"};
-const std::pair<int, int> k_range(18, 25); // Include end
+const std::pair<int, int> k_range(11, 25); // Include end
 const int NUMBER_OF_EXPERIMENTS = 3;
 const int EXPERIMENT_ROUNDS = 10;
+const int NUMBER_OF_SEARCHS = 100000;
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -31,6 +32,7 @@ void generate_data(std::vector<std::pair<int, int>> &data, size_t count)
 
 #ifdef BLOCK_1
 // Test
+const std::string name_mapping[] = {"Data structure A", "Data structure B", "Data structure C"};
 int main()
 {
     std::vector<std::pair<int, int>> data;
@@ -84,81 +86,110 @@ int main()
 
 #ifdef BLOCK_2
 // Homework test
+json result_json;
+const std::string filename = "result_k_" + std::to_string(k_range.first) + "_" + std::to_string(k_range.second) + ".json";
+const std::filesystem::path file_path = std::filesystem::current_path() / filename;
+std::vector<int> progress(3, -1);
+
+void save_and_exit(int signal)
+{
+    std::ofstream ofs(file_path);
+    ofs << result_json.dump(4);
+    ofs.close();
+    std::_Exit(0);
+}
+
 int main() 
 {
-    if (!std::filesystem::exists(std::filesystem::current_path() / "result"))
-        std::filesystem::create_directories(std::filesystem::current_path() / "result");
-    std::cout << "\033[2J" << "\033[s";
     auto experiment_start_time = std::chrono::high_resolution_clock::now();
+    std::cout << "\033[2J" << "\033[s";
+    std::signal(SIGINT, save_and_exit);
+    // load experiment result
+    if (!std::filesystem::exists(file_path))
+    {
+        std::ofstream ofs(file_path);
+        ofs.close();
+    }
+    std::ifstream ifs(file_path);
+    try
+    {
+        result_json = nlohmann::json::parse(ifs);
+    }
+    catch (...)
+    {
+    }
+    
+    ifs.close();
 
-    std::vector<int> set_k;
-    for (int i = k_range.first; i <= k_range.second; ++i)
-        set_k.push_back(i);
+    if (result_json.contains("progress"))
+        progress = result_json["progress"].get<std::vector<int>>();
+    else
+        result_json["progress"] = progress;
 
     std::vector<std::pair<int, int>> data;
     std::vector<int> search_ids;
-    search_ids.reserve(100000);
+    search_ids.reserve(NUMBER_OF_SEARCHS);
 
-    //  result[i][j][k]
-    //      i -> data structure type
-    //      j -> experiment type
-    //      k -> sum of run time
-
-    std::vector<std::vector<std::vector<std::chrono::milliseconds>>> result(
-        3, std::vector<std::vector<std::chrono::milliseconds>>(
-               NUMBER_OF_EXPERIMENTS, std::vector<std::chrono::milliseconds>(
-                                          set_k.size(), std::chrono::milliseconds(0))));
-
-    int data_rank = 0;
-    for (auto k : set_k)
+    for (int k = k_range.first; k <= k_range.second; ++k)
     {
+        if (k < progress[0])
+            continue;
+
         size_t n = 1 << k;
         for (int i = 0; i < EXPERIMENT_ROUNDS; ++i)
         {
+            if (k == progress[0] && i < progress[1])
+                continue;
+
             auto round_start_time = std::chrono::high_resolution_clock::now();
 
             std::cout << "\033[2K" << "Testing : k = " << k << ", Round : " << i + 1 << "\n";
             DataStructureA *a = new DataStructureA();
             DataStructureB *b = new DataStructureB();
             DataStructureC *c = new DataStructureC();
-            HomeworkRequirement *data_structure[] = {a, b, c};
-            // HomeworkRequirement *data_structure[] = {a, b};
+            std::vector<std::pair<HomeworkRequirement *, std::string>> data_structures = {
+                {a, "Data structure A"},
+                {b, "Data structure B"},
+                {c, "Data structure A"}
+            };
             
             generate_data(data, n);
             search_ids.clear();
-            for (size_t i = 0; i < 100000; ++i)
+            for (size_t i = 0; i < NUMBER_OF_SEARCHS; ++i)
                 search_ids.push_back(random_id(gen));
 
-            std::cout << "Previous test info :\n";
-            for (int experiment_number = 0; experiment_number < NUMBER_OF_EXPERIMENTS; ++experiment_number)
+            std::cout << "\033[2K" << "Previous test info :\n";
+            for (int data_structure_type = 0; data_structure_type < data_structures.size(); ++data_structure_type) // experiment 1
             {
-                auto experiment_start_time = std::chrono::high_resolution_clock::now();
-                for (int data_structure_type = 0; data_structure_type < sizeof(data_structure) / sizeof(HomeworkRequirement *); ++data_structure_type) // experiment 1
+                if (k == progress[0] && i == progress[1] && data_structure_type <= progress[2])
+                    continue;
+
+                std::cout << "\033[2K" << data_structures[data_structure_type].second << ":\n";
+                for (int experiment_number = 0; experiment_number < NUMBER_OF_EXPERIMENTS; ++experiment_number)
                 {
+                    std::cout << "\tExperiment " << experiment_number + 1;
                     auto start_time = std::chrono::high_resolution_clock::now();
                     if (experiment_number == 0)
                     {
                         for (auto d : data)
-                            data_structure[data_structure_type]->insert(d.first, d.second);
+                            data_structures[data_structure_type].first->insert(d.first, d.second);
                     }
                     else if (experiment_number == 1)
                     {
                         for (auto search_id : search_ids)
-                            data_structure[data_structure_type]->search(search_id);
+                            data_structures[data_structure_type].first->search(search_id);
                     }
                     else if (experiment_number == 2)
                     {
-                        data_structure[data_structure_type]->total();
+                        data_structures[data_structure_type].first->total();
                     }
-
                     auto end_time = std::chrono::high_resolution_clock::now();
                     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-                    result[data_structure_type][experiment_number][data_rank] += duration;
-                }
+                    result_json[data_structures[data_structure_type].second][std::to_string(experiment_number + 1)][std::to_string(k)][std::to_string(i)] = duration.count();
 
-                auto experiment_end_time = std::chrono::high_resolution_clock::now();
-                auto experiment_duration = std::chrono::duration_cast<std::chrono::milliseconds>(experiment_end_time - experiment_start_time);
-                std::cout << "\033[2K" << "Experiment " << experiment_number + 1 << " time : " << experiment_duration.count() << "(ms)\n";
+                    std::cout << "\033[K" << " time : " << duration.count() << "(ms)\n";
+                }
+                result_json["progress"] = std::vector<int>{k, i, data_structure_type};
             }
 
             auto round_end_time = std::chrono::high_resolution_clock::now();
@@ -166,48 +197,24 @@ int main()
 
             std::cout << "\033[2K" << "Total time : " << round_duration.count() << "(ms)\n";
             std::cout << "\033[u";
-        }
-
-        for (size_t i = 0; i < 3; ++i)
-        {
-            for (size_t j = 0; j < NUMBER_OF_EXPERIMENTS; ++j)
-            {
-                    result[i][j][data_rank] /= EXPERIMENT_ROUNDS;
-            }
-        }
-
-        json result_json;
-        result_json["k"] = k;
-        for (size_t i = 0; i < 3; ++i)
-        {
-            for (size_t j = 0; j < NUMBER_OF_EXPERIMENTS; ++j)
-                result_json[name_mapping[i]]["experiment_" + std::to_string(j + 1)] = result[i][j][data_rank].count();
-        }
-
-        std::string filename = "result_k_" + std::to_string(k) + ".json";
-        std::filesystem::path file_path = std::filesystem::current_path() / "result" / filename;
-        if (!std::filesystem::exists(file_path))
-            std::ofstream(file_path);
-        std::ofstream fs(file_path, std::ios::out | std::ios::trunc);
-        if (!fs.is_open())
-            std::cerr << "Cannot open file: " << file_path << std::endl;
-
-        fs << result_json.dump(4);
-        fs.close();
-
-        ++data_rank;
+        }      
     }
     std::cout << "\033[10B";
 
     auto experiment_end_time = std::chrono::high_resolution_clock::now();
     auto experiment_duration = std::chrono::duration_cast<std::chrono::milliseconds>(experiment_end_time - experiment_start_time);
     std::cout << "\nExperiment total time : " << experiment_duration.count() << "(ms)";
+
+    std::ofstream ofs(file_path);
+    ofs << result_json.dump(4);
+    ofs.close();
     return 0;
 }
 #endif
 
 #ifdef BLOCK_3
 // Extra test
+// 混合工作負載?
 int main()
 {
     return 0;
