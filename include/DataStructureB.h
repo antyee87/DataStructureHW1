@@ -4,9 +4,8 @@
 #include <vector>
 
 const int MAX_ID = 1 << 20;
-class StudentProfileB
+struct StudentProfilesB
 {
-public:
     std::vector<int> scores;
     int next_student = -1;
 };
@@ -18,6 +17,6 @@ public:
     void insert(int id, int score) override;
     std::vector<int> search(int id) override;
     size_t total() override;
-    StudentProfileB *data;
+    StudentProfilesB *data;
     int begin;
 };
