@@ -51,7 +51,7 @@ size_t DataStructureB::total()
     size_t cur_student = begin;
     while(cur_student > 0)
     {
-        for (auto score : data[cur_student].scores)
+        for (const auto& score : data[cur_student].scores)
             result += score;
         cur_student = data[cur_student].next_student;
     }

@@ -90,7 +90,7 @@ size_t DataStructureA::total()
     size_t result = 0;
     for (size_t i = 0; i < size; ++i)
     {
-        for (auto score : data[i]->scores)
+        for (const auto& score : data[i]->scores)
             result += score;
     }
     return result;

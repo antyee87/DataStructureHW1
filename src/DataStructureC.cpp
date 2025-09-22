@@ -67,7 +67,7 @@ size_t DataStructureC::total()
     Node *cur_node = head;
     while (cur_node != nullptr)
     {
-        for (auto score : cur_node->value.scores)
+        for (const auto& score : cur_node->value.scores)
             result += score;
 
         cur_node = cur_node->next;

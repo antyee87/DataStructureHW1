@@ -89,7 +89,6 @@ int main()
 json result_json;
 const std::string filename = "result_k_" + std::to_string(k_range.first) + "_" + std::to_string(k_range.second) + ".json";
 const std::filesystem::path file_path = std::filesystem::current_path() / filename;
-std::vector<int> progress(3, -1);
 
 void save_and_exit(int signal)
 {
@@ -121,26 +120,15 @@ int main()
     
     ifs.close();
 
-    if (result_json.contains("progress"))
-        progress = result_json["progress"].get<std::vector<int>>();
-    else
-        result_json["progress"] = progress;
-
     std::vector<std::pair<int, int>> data;
     std::vector<int> search_ids;
     search_ids.reserve(NUMBER_OF_SEARCHS);
 
     for (int k = k_range.first; k <= k_range.second; ++k)
     {
-        if (k < progress[0])
-            continue;
-
         size_t n = 1 << k;
         for (int i = 0; i < EXPERIMENT_ROUNDS; ++i)
         {
-            if (k == progress[0] && i < progress[1])
-                continue;
-
             auto round_start_time = std::chrono::high_resolution_clock::now();
 
             std::cout << "\033[2K" << "Testing : k = " << k << ", Round : " << i + 1 << "\n";
@@ -150,7 +138,7 @@ int main()
             std::vector<std::pair<HomeworkRequirement *, std::string>> data_structures = {
                 {a, "Data structure A"},
                 {b, "Data structure B"},
-                {c, "Data structure A"}
+                {c, "Data structure C"}
             };
             
             generate_data(data, n);
@@ -161,22 +149,35 @@ int main()
             std::cout << "\033[2K" << "Previous test info :\n";
             for (int data_structure_type = 0; data_structure_type < data_structures.size(); ++data_structure_type) // experiment 1
             {
-                if (k == progress[0] && i == progress[1] && data_structure_type <= progress[2])
+                const std::vector<std::string> keys = {"k=" + std::to_string(k), "round=" + std::to_string(i), data_structures[data_structure_type].second};
+                json *tmp_json = &result_json;
+                bool contained_object = true;
+                for (const auto& key : keys)
+                {
+                    if (!tmp_json->contains(key) || !(*tmp_json)[key].is_object())
+                    {
+                        contained_object = false;
+                        break;
+                    }
+                    tmp_json = &((*tmp_json)[key]);
+                }
+                if (contained_object)
                     continue;
 
                 std::cout << "\033[2K" << data_structures[data_structure_type].second << ":\n";
+                json part_result_json;
                 for (int experiment_number = 0; experiment_number < NUMBER_OF_EXPERIMENTS; ++experiment_number)
                 {
                     std::cout << "\tExperiment " << experiment_number + 1;
                     auto start_time = std::chrono::high_resolution_clock::now();
                     if (experiment_number == 0)
                     {
-                        for (auto d : data)
+                        for (const auto& d : data)
                             data_structures[data_structure_type].first->insert(d.first, d.second);
                     }
                     else if (experiment_number == 1)
                     {
-                        for (auto search_id : search_ids)
+                        for (const auto& search_id : search_ids)
                             data_structures[data_structure_type].first->search(search_id);
                     }
                     else if (experiment_number == 2)
@@ -185,11 +186,11 @@ int main()
                     }
                     auto end_time = std::chrono::high_resolution_clock::now();
                     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-                    result_json[data_structures[data_structure_type].second][std::to_string(experiment_number + 1)][std::to_string(k)][std::to_string(i)] = duration.count();
+                    part_result_json[std::to_string(experiment_number + 1)] = duration.count();
 
                     std::cout << "\033[K" << " time : " << duration.count() << "(ms)\n";
                 }
-                result_json["progress"] = std::vector<int>{k, i, data_structure_type};
+                result_json["k=" + std::to_string(k)]["round=" + std::to_string(i)][data_structures[data_structure_type].second] = part_result_json;
             }
 
             auto round_end_time = std::chrono::high_resolution_clock::now();
