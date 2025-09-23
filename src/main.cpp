@@ -1,5 +1,4 @@
 #include <chrono>
-#include <csignal>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -28,6 +27,14 @@ void generate_data(std::vector<std::pair<int, int>> &data, size_t count)
     data.reserve(count + 5);
     for (size_t i = 0; i < count; ++i)
         data.emplace_back(random_id(gen), random_score(gen));
+}
+
+void generate_id(std::vector<int>& data, size_t count)
+{
+    data.clear();
+    data.reserve(count + 5);
+    for (size_t i = 0; i < count; ++i)
+        data.push_back(random_id(gen));
 }
 
 #ifdef BLOCK_1
@@ -90,19 +97,10 @@ json result_json;
 const std::string filename = "result_k_" + std::to_string(k_range.first) + "_" + std::to_string(k_range.second) + ".json";
 const std::filesystem::path file_path = std::filesystem::current_path() / filename;
 
-void save_and_exit(int signal)
-{
-    std::ofstream ofs(file_path);
-    ofs << result_json.dump(4);
-    ofs.close();
-    std::_Exit(0);
-}
-
 int main() 
 {
     auto experiment_start_time = std::chrono::high_resolution_clock::now();
     std::cout << "\033[2J" << "\033[s";
-    std::signal(SIGINT, save_and_exit);
     // load experiment result
     if (!std::filesystem::exists(file_path))
     {
@@ -117,7 +115,6 @@ int main()
     catch (...)
     {
     }
-    
     ifs.close();
 
     std::vector<std::pair<int, int>> data;
@@ -142,14 +139,12 @@ int main()
             };
             
             generate_data(data, n);
-            search_ids.clear();
-            for (size_t i = 0; i < NUMBER_OF_SEARCHS; ++i)
-                search_ids.push_back(random_id(gen));
+            generate_id(search_ids, NUMBER_OF_SEARCHS);
 
             std::cout << "\033[2K" << "Previous test info :\n";
             for (int data_structure_type = 0; data_structure_type < data_structures.size(); ++data_structure_type) // experiment 1
             {
-                const std::vector<std::string> keys = {"k=" + std::to_string(k), "round=" + std::to_string(i), data_structures[data_structure_type].second};
+                const std::vector<std::string> keys = {"k=" + std::to_string(k), "round=" + std::to_string(i + 1), data_structures[data_structure_type].second};
                 json *tmp_json = &result_json;
                 bool contained_object = true;
                 for (const auto& key : keys)
@@ -190,7 +185,13 @@ int main()
 
                     std::cout << "\033[K" << " time : " << duration.count() << "(ms)\n";
                 }
-                result_json["k=" + std::to_string(k)]["round=" + std::to_string(i)][data_structures[data_structure_type].second] = part_result_json;
+                // Serialize
+                result_json["k=" + std::to_string(k)]["round=" + std::to_string(i + 1)][data_structures[data_structure_type].second] = part_result_json;
+                std::ofstream ofs(file_path);
+                ofs << result_json.dump(4);
+                ofs.close();
+
+                delete data_structures[data_structure_type].first;
             }
 
             auto round_end_time = std::chrono::high_resolution_clock::now();
