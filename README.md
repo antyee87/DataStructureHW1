@@ -1,5 +1,6 @@
 # 資料結構 HW1
 ## Code Explanation
+#### Code: https://github.com/antyee87/DataStructureHW1
 * ### Class
     * HomewprkRequirement
         - An interface with:
@@ -55,7 +56,7 @@
     |25 |  1,048,576|1.0   |
 
     * ##### Insertion time
-    ![Insertion time](https://www.jaspersoft.com/content/dam/jaspersoft/images/graphics/infographics/pie-chart-example.svg)
+    ![Insertion time](https://github.com/antyee87/DataStructureHW1/blob/main/experiment1.png?raw=true)
 
     設n為資料量
     Data structure A 的插入效率: O(n)
@@ -65,7 +66,7 @@
     Data structure A每k+1時，需要插入量為2倍，遍歷時長與鏈表長度成正相關，從k=20所花時間 取 2 * [k-1 -> k的長度期望值倍率] * [k-1資料點所花時間]
 
     * ##### Search time
-    ![Search time](https://www.jaspersoft.com/content/dam/jaspersoft/images/graphics/infographics/pie-chart-example.svg)
+    ![Search time](https://github.com/antyee87/DataStructureHW1/blob/main/experiment2.png?raw=true)
 
     設n為長度
     Data structure A 的搜尋效率: O(log n)
@@ -75,7 +76,7 @@
 
 
     * ##### Traversal time
-    ![Traversa time](https://www.jaspersoft.com/content/dam/jaspersoft/images/graphics/infographics/pie-chart-example.svg)
+    ![Traversa time](https://github.com/antyee87/DataStructureHW1/blob/main/experiment3.png?raw=true)
 
     遍歷速度基本上相同，只差在CPU cache命中率
     Data structure A會稍慢，因為為了避免插入效率過低，用指標儲存資料，指標解引用耗費了額外時間
