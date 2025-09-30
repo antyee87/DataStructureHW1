@@ -92,7 +92,7 @@ int main()
 #endif
 
 #ifdef BLOCK_2
-// Homework test
+// Homework experiment
 json result_json;
 const std::string filename = "result_k_" + std::to_string(k_range.first) + "_" + std::to_string(k_range.second) + ".json";
 const std::filesystem::path file_path = std::filesystem::current_path() / filename;
@@ -101,7 +101,7 @@ int main()
 {
     auto experiment_start_time = std::chrono::high_resolution_clock::now();
     std::cout << "\033[2J" << "\033[s";
-    // load experiment result
+    // Load experiment result
     if (!std::filesystem::exists(file_path))
     {
         std::ofstream ofs(file_path);
@@ -128,6 +128,7 @@ int main()
         {
             auto round_start_time = std::chrono::high_resolution_clock::now();
 
+            std::cout << "\033[u";
             std::cout << "\033[2K" << "Testing : k = " << k << ", Round : " << i + 1 << "\n";
             DataStructureA *a = new DataStructureA();
             DataStructureB *b = new DataStructureB();
@@ -167,8 +168,16 @@ int main()
                     auto start_time = std::chrono::high_resolution_clock::now();
                     if (experiment_number == 0)
                     {
-                        for (const auto& d : data)
-                            data_structures[data_structure_type].first->insert(d.first, d.second);
+                        // Skip data structure C insertion experiment when k > 20
+                        if (k > 20 && data_structure_type == 2)
+                        {
+                            data_structures[data_structure_type].first = new DataStructureC(data);
+                        }
+                        else
+                        {
+                            for (const auto &d : data)
+                                data_structures[data_structure_type].first->insert(d.first, d.second);
+                        }
                     }
                     else if (experiment_number == 1)
                     {
@@ -180,12 +189,24 @@ int main()
                         data_structures[data_structure_type].first->total();
                     }
                     auto end_time = std::chrono::high_resolution_clock::now();
-                    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-                    part_result_json[std::to_string(experiment_number + 1)] = duration.count();
 
-                    std::cout << "\033[K" << " time : " << duration.count() << "(ms)\n";
+                    if (experiment_number == 0 || experiment_number == 1)
+                    {
+                        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+                        part_result_json[std::to_string(experiment_number + 1)] = duration.count();
+
+                        std::cout << "\033[K" << " time : " << duration.count() << "(ms)\n";
+                    }
+                    else if (experiment_number == 2)
+                    {
+                        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+                        part_result_json[std::to_string(experiment_number + 1)] = duration.count();
+
+                        std::cout << "\033[K" << " time : " << duration.count() << "(µs)\n";
+                    }
+                    
                 }
-                // Serialize
+                // Save experiment result
                 result_json["k=" + std::to_string(k)]["round=" + std::to_string(i + 1)][data_structures[data_structure_type].second] = part_result_json;
                 std::ofstream ofs(file_path);
                 ofs << result_json.dump(4);
@@ -207,15 +228,12 @@ int main()
     auto experiment_duration = std::chrono::duration_cast<std::chrono::milliseconds>(experiment_end_time - experiment_start_time);
     std::cout << "\nExperiment total time : " << experiment_duration.count() << "(ms)";
 
-    std::ofstream ofs(file_path);
-    ofs << result_json.dump(4);
-    ofs.close();
     return 0;
 }
 #endif
 
 #ifdef BLOCK_3
-// Extra test
+// Extra experiment
 // 混合工作負載?
 int main()
 {

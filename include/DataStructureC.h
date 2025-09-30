@@ -21,6 +21,7 @@ public:
     };
 
     DataStructureC();
+    DataStructureC(const std::vector<std::pair<int, int>>& data);
     ~DataStructureC();
     void insert(int id, int score) override;
     std::vector<int> search(int id) override;

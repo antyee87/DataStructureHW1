@@ -1,7 +1,34 @@
 #include "DataStructureC.h"
+#include <algorithm>
+#include <unordered_map>
 
 DataStructureC::DataStructureC() : head(nullptr) {}
-DataStructureC::~DataStructureC()
+
+DataStructureC::DataStructureC(const std::vector<std::pair<int, int>> &data) : head(nullptr)
+{
+    std::unordered_map<int, Node *> node_map;
+    for (const auto& d : data)
+    {
+        if (!node_map.contains(d.first))
+        {
+            Node *new_node = new Node(d.first);
+            node_map[d.first] = new_node;
+        }
+        node_map[d.first]->value.scores.push_back(d.second);
+    }
+    std::vector<Node *> node_vector;
+    node_vector.reserve(node_map.size());
+    for (const auto& [key, value] : node_map)
+        node_vector.push_back(value);
+    std::sort(node_vector.begin(), node_vector.end());
+    for (auto it = node_vector.rbegin(); it != node_vector.rend(); ++it)
+    {
+        (*it)->next = head;
+        head = *it;
+    }
+}
+
+    DataStructureC::~DataStructureC()
 {
     Node *cur_node = head;
     while (cur_node != nullptr)
@@ -35,7 +62,7 @@ void DataStructureC::insert(int id, int score)
             new_node_prev_node = cur_node;
         cur_node = cur_node->next;
     }
-
+    // Add node
     if (new_node_prev_node == nullptr)
     {
         new_node->next = head;
@@ -58,7 +85,7 @@ std::vector<int> DataStructureC::search(int id) {
 
         cur_node = cur_node->next;
     }
-    return std::vector<int>{-1};
+    return std::vector<int>();
 }
 
 size_t DataStructureC::total()

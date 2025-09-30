@@ -10,7 +10,7 @@ void DataStructureB::insert(int id, int score)
 {
     data[id].scores.push_back(score);
 
-    // If linked
+    // If linked, return
     if (data[id].next_student != -1)
         return;
 
@@ -42,7 +42,7 @@ std::vector<int> DataStructureB::search(int id)
     if (data[id].scores.size() > 0)
         return data[id].scores;
     else
-        return std::vector<int>{-1};
+        return std::vector<int>();
 }
 
 size_t DataStructureB::total()

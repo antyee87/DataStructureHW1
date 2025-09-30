@@ -83,7 +83,7 @@ std::vector<int> DataStructureA::search(int id)
     if (found)
         return data[mid]->scores;
     else
-        return std::vector<int>{-1};
+        return std::vector<int>();
 }
 size_t DataStructureA::total()
 {
