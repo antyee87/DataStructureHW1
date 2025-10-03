@@ -232,7 +232,7 @@
     |23 |  1,048,224|1.0183|
     |24 |  1,048,576|1.0003|
     |25 |  1,048,576|1.0   |
-    
+
     <br>
 
     2. ##### Search time<a id=SearchTime></a>
@@ -246,10 +246,25 @@
     <br>
 
     3. ##### Traversal time<a id=TraversalTime></a>
-    ![Traversa time](https://github.com/antyee87/DataStructureHW1/blob/main/experiment3.png?raw=true)
+    ![Traversal time](https://github.com/antyee87/DataStructureHW1/blob/main/experiment3.png?raw=true)
     <br>
     遍歷時間複雜度都是 O(n)
-    遍歷速度基本上相同，但有些有趣的發現
+    遍歷速度基本上相同，但有些有趣的發現:
     Data structure A會稍慢，因為為了避免插入效率過低，用指標儲存資料，指標解引用耗費了額外時間
     Data structure B，在資料量少時資料的記憶體位置並不夠連續，容易cache miss，故速度比其他兩者慢，但随資料量增加，連續性、速度也隨之增加
     Data structure C，雖然是鏈表，但又照記憶體位置排序節點，表現起來跟動態陣列相近，但如上所說，指標解引耗費額外時間，讓他在整個遍歷實驗裡成為表現最佳的資料結構
+    <br>    
+
+    4. #### Mixed test time<a id=MixedTestTime></a>
+    ![Mixed test time](https://github.com/antyee87/DataStructureHW1/blob/main/experimentExtra.png?raw=true)
+    <br>
+    ###### 動機:
+    資料結構是要使用的，我想測試看看在不同的插入-搜尋比例下，各資料結構的表現如何
+    根據網路上的資料，政大113學年度在學學生人數為16,899人，我假設學號都是連續的，選擇測試資料量為$2^{14}$
+    資料生成是隨機的，插入-搜尋比例並不完全準確的
+    ###### 結果:
+    Data structure A 在本資料量下表現最為優秀，插入效率O(n)，搜尋效率O(log n)
+    Data structure B 稍遜一籌，插入效率O(n)，搜尋效率O(1)，在本資料量下，插入太慢拖累了表現，link的設計難以說是有益的
+    Data structure C 表現極差，插入效率O(n)，搜尋效率O(n)，純粹的鏈表只適合拿來當作學習圖的踏板，並非是實用的資料結構
+
+
