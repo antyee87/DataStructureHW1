@@ -10,6 +10,9 @@
     - [Insertion time](#InsertionTime)
     - [Search time](#SearchTime)
     - [Traversal time](#TraversalTime)
+    - [Mixed test time](#mixed-test-time)
+
+- [Thoughts](#Thoughts)
 
 ## Code Explanation<a id="CodeExplanation"></a>
 #### Code: https://github.com/antyee87/DataStructureHW1
@@ -268,3 +271,7 @@
     Data structure C 表現極差，插入效率O(n)，搜尋效率O(n)，純粹的鏈表只適合拿來當作學習圖的踏板，並非是實用的資料結構
 
 
+## Thoughts<a id=Thoughts></a>
+過去學習演算法或資料結構後，基本上只有少量的實作，而不會真的去比較不同演算法或資料結構之間的差異(只有高中學習歷程做sorting速度比較，黑歷史)。關於如何構建實驗用的程式，需要如何解釋圖片，或是需要在報告中寫出哪些資訊，都不是很了解，作業要求只有一頁word檔還是太難了。這次的三個資料結構，有種刁難人的感覺，總想改進，但仔細想想要是改進了就不符合作業要求了，實在不是很令人愉悅。
+這次依然高強度使用ChatGPT，從應該如何設計實驗架構，到debug，到如何用json儲存檔案(我覺得json比較好讀)等等，除了有時要引誘它說出符合我預期的答案有些困難，整體而言，他很好的簡化我查閱資料與debug的困難。然後我有時會問一些比較跳脫的問題，不是很重要。
+聊天紀錄:https://chatgpt.com/share/68df9b2b-55b4-8002-ad3f-3798fd1344e3
