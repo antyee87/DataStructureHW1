@@ -15,19 +15,21 @@ void DataStructureB::insert(int id, int score)
         return;
 
     // Construct link
-    for (size_t i = id - 1; i >= 1; --i)
+    // Find nearest id before this id
+    for (int i = id - 1; i >= 1; --i)
     {
-        if (data[i].scores.size() > 0)
+        if (data[i].next_student != -1)
         {
             data[id].next_student = data[i].next_student;
             data[i].next_student = id;
             return;
         }
     }
+    // Find nearest id after this id
     begin = id;
-    for (size_t i = id + 1; i <= MAX_ID; ++i)
+    for (int i = id + 1; i <= MAX_ID; ++i)
     {
-        if (data[i].scores.size() > 0)
+        if (data[i].next_student != -1)
         {
             data[id].next_student = i;
             return;

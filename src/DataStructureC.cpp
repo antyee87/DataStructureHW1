@@ -41,7 +41,7 @@ DataStructureC::DataStructureC(const std::vector<std::pair<int, int>> &data) : h
 
 void DataStructureC::insert(int id, int score)
 {
-    // Find if id exist, traversal, if not exist, add node
+    // Linear search if id exist, if not exist then add node
     Node *new_node = new Node(id);
     new_node->value.scores.push_back(score);
 
@@ -62,7 +62,7 @@ void DataStructureC::insert(int id, int score)
             new_node_prev_node = cur_node;
         cur_node = cur_node->next;
     }
-    // Add node
+    // Insert node
     if (new_node_prev_node == nullptr)
     {
         new_node->next = head;
