@@ -16,6 +16,7 @@
 
 ## Code Explanation<a id="CodeExplanation"></a>
 #### Code: https://github.com/antyee87/DataStructureHW1
+這個PDF的markdown放在github上
 * ### Class
     * HomewprkRequirement
         - An interface with:
@@ -210,11 +211,11 @@
     1. ##### Insertion time<a id=InsertionTime></a>
     ![Insertion time](https://github.com/antyee87/DataStructureHW1/blob/main/experiment1.png?raw=true)
     <br>
-    Data structure A 插入的時間複雜度O(n)
-    在本實驗中，因為id上限是$2^{20}$，儲存完所有id後，所花時間只剩下二分搜尋，但陣列長度上限為$2^{20}$，所以時間複雜度應該可以視為從O(n)->O(1)
-    Data structure B 插入的時間複雜度: O(n)
-    在本實驗中，建立link的時間複雜度應該算O(1)，因為陣列長度固定為$2^{20}$
-    Data structure C 插入的時間複雜度: O(n)
+    Data structure A 插入的時間複雜度O(n)<br>
+    在本實驗中，因為id上限是$2^{20}$，儲存完所有id後，所花時間只剩下二分搜尋，但陣列長度上限為$2^{20}$，所以時間複雜度應該可以視為從O(n)->O(1)<br>
+    Data structure B 插入的時間複雜度: O(n)<br>
+    在本實驗中，建立link的時間複雜度應該算O(1)，因為陣列長度固定為$2^{20}$<br>
+    Data structure C 插入的時間複雜度: O(n)<br>
 
     Data structure C每k+1時，需要插入量為2倍，遍歷時長與鏈表長度成正相關，從k=20所花時間，保守估計為 2 * [k-1 -> k的長度期望值倍率] * [k-1資料點所花時間]
         Data structure A、C的長度期望值為: $2^{20}(1-(1 - \frac{1}{2^{20}})^{2^k})$
@@ -241,37 +242,36 @@
     2. ##### Search time<a id=SearchTime></a>
     ![Search time](https://github.com/antyee87/DataStructureHW1/blob/main/experiment2.png?raw=true)
     <br>
-    Data structure A 搜尋的時間複雜度: O(log n)
-    Data structure B 搜尋的時間複雜度: O(1)
-    Data structure C 搜尋的時間複雜度: O(n)
-    本實驗中由於id大小的限制，Data structure C長度存在上限，時間複雜度會慢慢變O(1)
-    圖中折線特徵大致符合預測，除了Data structure C在k=24時時間突然衝髙，有可能是其他程式佔用電腦資源的影響或是cache miss
-    <br>
+    Data structure A 搜尋的時間複雜度: O(log n)<br>
+    Data structure B 搜尋的時間複雜度: O(1)<br>
+    Data structure C 搜尋的時間複雜度: O(n)<br>
+    本實驗中由於id大小的限制，Data structure C長度存在上限，時間複雜度會慢慢變O(1)<br>
+    圖中折線特徵大致符合預測，除了Data structure C在k=24時時間突然衝髙，有可能是其他程式佔用電腦資源的影響或是cache miss<br>
 
     3. ##### Traversal time<a id=TraversalTime></a>
     ![Traversal time](https://github.com/antyee87/DataStructureHW1/blob/main/experiment3.png?raw=true)
     <br>
     遍歷時間複雜度都是 O(n)
-    遍歷速度基本上相同，但有些有趣的發現:
-    Data structure A會稍慢，因為為了避免插入效率過低，用指標儲存資料，指標解引用耗費了額外時間
-    Data structure B，在資料量少時資料的記憶體位置並不夠連續，容易cache miss，故速度比其他兩者慢，但随資料量增加，連續性、速度也隨之增加
-    Data structure C，雖然是鏈表，但又照記憶體位置排序節點，表現起來跟動態陣列相近，但如上所說，指標解引耗費額外時間，讓他在整個遍歷實驗裡成為表現最佳的資料結構
+    遍歷速度基本上相同，但有些有趣的發現:<br>
+    Data structure A會稍慢，因為為了避免插入效率過低，用指標儲存資料，指標解引用耗費了額外時間<br>
+    Data structure B，在資料量少時資料的記憶體位置並不夠連續，容易cache miss，故速度比其他兩者慢，但随資料量增加，連續性、速度也隨之增加<br>
+    Data structure C，雖然是鏈表，但又照記憶體位置排序節點，表現起來跟動態陣列相近，但如上所說，指標解引耗費額外時間，讓他在整個遍歷實驗裡成為表現最佳的資料結構<br>
     <br>    
 
     4. #### Mixed test time<a id=MixedTestTime></a>
     ![Mixed test time](https://github.com/antyee87/DataStructureHW1/blob/main/experimentExtra.png?raw=true)
     <br>
     ###### 動機:
-    資料結構是要使用的，我想測試看看在不同的插入-搜尋比例下，各資料結構的表現如何
-    根據網路上的資料，政大113學年度在學學生人數為16,899人，我假設學號都是連續的，選擇測試資料量為$2^{14}$
-    資料生成是隨機的，插入-搜尋比例並不完全準確的
+    資料結構是要使用的，我想測試看看在不同的插入-搜尋比例下，各資料結構的表現如何<br>
+    根據網路上的資料，政大113學年度在學學生人數為16,899人，我假設學號都是連續的，選擇測試資料量為$2^{14}$<br>
+    資料生成是隨機的，插入-搜尋比例並不完全準確的<br>
     ###### 結果:
-    Data structure A 在本資料量下表現最為優秀，插入效率O(n)，搜尋效率O(log n)
-    Data structure B 稍遜一籌，插入效率O(n)，搜尋效率O(1)，在本資料量下，插入太慢拖累了表現，link的設計難以說是有益的
-    Data structure C 表現極差，插入效率O(n)，搜尋效率O(n)，純粹的鏈表只適合拿來當作學習圖的踏板，並非是實用的資料結構
+    Data structure A 在本資料量下表現最為優秀，插入效率O(n)，搜尋效率O(log n)<br>
+    Data structure B 稍遜一籌，插入效率O(n)，搜尋效率O(1)，在本資料量下，插入太慢拖累了表現，link的設計難以說是有益的<br>
+    Data structure C 表現極差，插入效率O(n)，搜尋效率O(n)，純粹的鏈表只適合拿來當作學習圖的踏板，並非是實用的資料結構<br>
 
 
 ## Thoughts<a id=Thoughts></a>
-過去學習演算法或資料結構後，基本上只有少量的實作，而不會真的去比較不同演算法或資料結構之間的差異(只有高中學習歷程做sorting速度比較，黑歷史)。關於如何構建實驗用的程式，需要如何解釋圖片，或是需要在報告中寫出哪些資訊，都不是很了解，作業要求只有一頁word檔還是太難了。這次的三個資料結構，有種刁難人的感覺，總想改進，但仔細想想要是改進了就不符合作業要求了，實在不是很令人愉悅。
-這次依然高強度使用ChatGPT，從應該如何設計實驗架構，到debug，到如何用json儲存檔案(我覺得json比較好讀)等等，除了有時要引誘它說出符合我預期的答案有些困難，整體而言，他很好的簡化我查閱資料與debug的困難。然後我有時會問一些比較跳脫的問題，不是很重要。
+過去學習演算法或資料結構後，基本上只有少量的實作，而不會真的去比較不同演算法或資料結構之間的差異(只有高中學習歷程做sorting速度比較，黑歷史)。關於如何構建實驗用的程式，需要如何解釋圖片，或是需要在報告中寫出哪些資訊，都不是很了解，作業要求只有一頁word檔還是太難了。這次的三個資料結構，有種刁難人的感覺，總想改進，但仔細想想要是改進了就不符合作業要求了，實在不是很令人愉悅。<br>
+這次依然高強度使用ChatGPT，從應該如何設計實驗架構，到debug，到如何用json儲存檔案(我覺得json比較好讀)等等，除了有時要引誘它說出符合我預期的答案有些困難，整體而言，他很好的簡化我查閱資料與debug的困難。然後我有時會問一些比較跳脫的問題，不是很重要。<br>
 聊天紀錄:https://chatgpt.com/share/68df9b2b-55b4-8002-ad3f-3798fd1344e3
